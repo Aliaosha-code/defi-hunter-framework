@@ -70,6 +70,12 @@ For a new authorized project, start Codex by reading
   subagents, framework evolution, script/template updates, and skill evolution
   proposals when the current workflow is insufficient.
 
+Read `CREATIVE_DISCOVERY.md` before spending too much time on generic scanner
+hits. Known patterns are useful for orientation, but the framework should
+prioritize protocol-specific promises, weird states, order perturbations,
+unit-boundary mismatches, honest-but-surprising dependencies, and negative
+space checks.
+
 Then initialize or attach the target with the commands below.
 
 Put the authorization statement at the top of the session before running any
@@ -125,6 +131,12 @@ The generated subagent roles cover scope mapping, value flow, accounting,
 oracle/economic analysis, invariant design, validation, and framework
 evolution. Subagent results should be merged through `merge-agent`, not written
 directly into candidate/finding tables.
+
+Generate a creative discovery worksheet:
+
+```bash
+python3 scripts/auditctl.py creative-plan my-target
+```
 
 Run the high-signal scanner and promote hits into `candidates.tsv` as
 `suspected`:
@@ -211,16 +223,42 @@ python3 scripts/auditctl.py evolve my-target --lesson "Oracle route tests must i
    command.
 4. Protocol map: follow value flow, roles, accounting units, oracles,
    external integrations, and admin controls.
-5. Parallel passes: run scope, value-flow, accounting, oracle/economic,
-   invariant, validator, and skill-evolution roles.
-6. Candidate promotion: scanner hits and code observations start as
+5. Creative discovery: use `CREATIVE_DISCOVERY.md` to generate hypotheses from
+   protocol-specific promises, counterfactual states, order perturbations,
+   unit-boundary mismatches, honest-but-surprising dependencies, and negative
+   space checks.
+6. Parallel passes: run scope, value-flow, accounting, oracle/economic,
+   invariant, validator, novelty-hunter, adversarial-reviewer, and
+   skill-evolution roles.
+7. Candidate promotion: scanner hits and code observations start as
    `suspected`; promote only with concrete code evidence and an attack path.
-7. Validation: write a local unit test, invariant, fuzz harness, or read-only
+   Generic scanner hits should be down-ranked unless they connect to a
+   protocol-specific property.
+8. Validation: write a local unit test, invariant, fuzz harness, or read-only
    fork simulation.
-8. Reporting: package confirmed findings immediately; record false positives
+9. Reporting: package confirmed findings immediately; record false positives
    with the disproof path.
-9. Evolution: update `skill-evolution.md` with workflow changes that should be
+10. Evolution: update `skill-evolution.md` with workflow changes that should be
    added to future skills, scripts, or templates.
+
+## Creative Discovery Layer
+
+Common vulnerability classes are usually already scanned by other auditors.
+Use them, but do not stop there. Each audit round should include at least one
+non-template hypothesis pass:
+
+- write the protocol's unique promises in plain language;
+- create weird but legal states the protocol may not expect;
+- reorder allowed actions and compare final states;
+- trace every unit conversion boundary;
+- test honest dependencies with surprising legal behavior;
+- search for missing checks instead of only suspicious code;
+- build a small reference model and compare the protocol against it;
+- invert scanner hits by asking what nearby behavior the scanner cannot see.
+
+Novel hypotheses must still be treated as unproven until a local test,
+invariant, fuzz case, deterministic trace, or read-only fork simulation proves
+the issue.
 
 ## Target Phases
 
@@ -312,6 +350,7 @@ guesswork:
 - `false_positive_filters`
 - `changed_files`
 - `framework_or_skill_evolution_needed`
+- `creative_hypotheses`
 
 The main Codex should merge only evidence-backed candidate changes into
 `candidates.tsv` or `findings.tsv`.

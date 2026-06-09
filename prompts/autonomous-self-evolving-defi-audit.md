@@ -9,6 +9,7 @@ Read these files first:
 2. `README.md`
 3. `FRAMEWORK.md`
 4. `prompts/authorized-defi-audit.md`
+5. `CREATIVE_DISCOVERY.md`
 
 Replace the placeholders before running:
 
@@ -45,6 +46,8 @@ Replace the placeholders before running:
 4. 如果当前框架、提示词、脚本、模板、测试 harness、扫描器、子代理分工不够用，你可以在本地创建或修改它们。
 5. 每一次自进化都必须服务于当前授权审计目标，并记录原因、改动、验证方式和下一步用途。
 6. 不要把猜测当漏洞。高危判断必须有代码路径、影响路径和可复现本地证据。
+7. 常见漏洞和 scanner hits 只作为热身。大部分明显漏洞别人已经扫过，必须额外做协议特有、反事实、组合路径、顺序扰动和负空间发现。
+8. 每轮至少提出 3 个非模板化 creative hypotheses，并给出最快本地验证或证伪方式。
 
 完成条件：
 只有满足以下任一条件才允许停止：
@@ -57,14 +60,16 @@ Replace the placeholders before running:
 
 启动步骤：
 1. 读取 `AUTHORIZATION.md`，确认本轮只做授权/本地/只读模拟审计。
-2. 读取 `FRAMEWORK.md` 和 `prompts/authorized-defi-audit.md`，把它们作为起点，不作为限制。
+2. 读取 `FRAMEWORK.md`、`CREATIVE_DISCOVERY.md` 和 `prompts/authorized-defi-audit.md`，把它们作为起点，不作为限制。
 3. 运行：
    `python3 scripts/auditctl.py --help`
 4. 初始化或附加目标：
    `python3 scripts/auditctl.py init <project name> --repo <本地路径> --family <项目类型> --authorization explicit-whitehat-authorization`
 5. 生成子代理提示词：
    `python3 scripts/auditctl.py agents <project name>`
-6. 如果 multi-agent 工具可用，立即创建下面的子代理并行研究；如果不可用，就由主代理按角色顺序执行。
+6. 生成创造性发现计划：
+   `python3 scripts/auditctl.py creative-plan <project name>`
+7. 如果 multi-agent 工具可用，立即创建下面的子代理并行研究；如果不可用，就由主代理按角色顺序执行。
 
 子代理要求：
 - 子代理 A：scope mapper
@@ -81,6 +86,10 @@ Replace the placeholders before running:
   负责把 top candidates 缩成最小本地 PoC，或用代码/测试证伪。
 - 子代理 G：framework evolution reviewer
   负责发现当前框架、skill、提示词、脚本、模板、扫描器、子代理分工的不足，并提出或直接落地本地改进。
+- 子代理 H：novelty hunter
+  负责基于 `CREATIVE_DISCOVERY.md` 生成协议特有假设，重点寻找常见扫描器不容易发现的 weird state、顺序扰动、组合边界和负空间问题。
+- 子代理 I：adversarial reviewer
+  负责攻击当前审计计划本身，找出被过早降权的 scanner hit、误判 false positive、未读文件、隐含信任假设和缺失测试。
 
 每个子代理输出必须包含：
 - role
@@ -92,6 +101,7 @@ Replace the placeholders before running:
 - false_positive_filters
 - changed_files
 - framework_or_skill_evolution_needed
+- creative_hypotheses
 
 子代理合并规则：
 1. 不要让子代理直接把猜测写成 confirmed finding。
@@ -115,6 +125,17 @@ Replace the placeholders before running:
 - 如何验证这个改动有用；
 - 是否影响当前候选漏洞判断；
 - 下一轮应该如何复用。
+
+创造性发现规则：
+每轮审计必须至少执行一次 creative discovery pass：
+1. 写出协议自己的独特承诺，不要只套通用 checklist；
+2. 构造协议以为“不可能”的状态；
+3. 重排正常用户操作顺序；
+4. 跟踪所有单位、精度、rounding、share、debt、oracle quote 边界；
+5. 使用 honest-but-surprising dependency 行为，而不是只假设恶意依赖；
+6. 找 missing checks、missing postconditions、missing binding，而不是只找可疑代码；
+7. 为每个假设写出最快本地证伪路径；
+8. 只有经本地证据证明，才升级候选状态。
 
 高价值攻击面优先级：
 - solvency 破坏；

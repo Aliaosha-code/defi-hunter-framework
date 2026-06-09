@@ -7,7 +7,8 @@ authorized project scope into local tests, invariants, private evidence, and
 report drafts.
 
 Start with [AUTHORIZATION.md](AUTHORIZATION.md), then read
-[FRAMEWORK.md](FRAMEWORK.md). The main controller is:
+[FRAMEWORK.md](FRAMEWORK.md) and
+[CREATIVE_DISCOVERY.md](CREATIVE_DISCOVERY.md). The main controller is:
 
 ```bash
 python3 scripts/auditctl.py --help
@@ -18,6 +19,11 @@ For a fresh authorized audit, copy and fill this startup prompt:
 
 For a more autonomous run with subagents and framework/skill evolution, use:
 [prompts/autonomous-self-evolving-defi-audit.md](prompts/autonomous-self-evolving-defi-audit.md).
+
+The framework is intentionally not just a checklist. Use generic scanners to
+get oriented, then use [CREATIVE_DISCOVERY.md](CREATIVE_DISCOVERY.md) to build
+protocol-specific hypotheses that common tools and repeated bounty reviews are
+likely to miss.
 
 ## Authorization Header
 
@@ -39,9 +45,11 @@ top of a Codex session before starting project-specific audit work:
 2. Use only the project repository or repositories in the authorized scope.
 3. Run baseline build and tests before adding harnesses.
 4. Map value flows before reading files line by line.
-5. Convert each hypothesis into a local invariant, unit test, fuzz test, or
+5. Use creative discovery to generate protocol-specific hypotheses beyond
+   generic scanner hits.
+6. Convert each hypothesis into a local invariant, unit test, fuzz test, or
    read-only fork simulation.
-6. Treat every finding as unconfirmed until it has a minimal reproduction.
+7. Treat every finding as unconfirmed until it has a minimal reproduction.
 
 ## Framework Commands
 
@@ -101,6 +109,7 @@ Generate and merge subagent work:
 
 ```bash
 python3 scripts/auditctl.py agents my-target
+python3 scripts/auditctl.py creative-plan my-target
 python3 scripts/auditctl.py merge-agent my-target --file agent-output.json
 ```
 

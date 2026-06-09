@@ -584,6 +584,7 @@ Every final subagent output must include:
 - false_positive_filters
 - changed_files
 - framework_or_skill_evolution_needed
+- creative_hypotheses
 
 ## Scope Mapper
 
@@ -634,6 +635,23 @@ new script, prompt, harness, invariant template, scanner rule, or skill update
 is useful, describe the exact change and how it should be validated.
 
 Output to: `{out / "skill-evolution.md"}`
+
+## Novelty Hunter
+
+Use CREATIVE_DISCOVERY.md. Generate protocol-specific hypotheses that are not
+direct copies of common checklists. Focus on protocol promises, weird but legal
+states, order perturbations, unit-boundary mismatches, honest-but-surprising
+dependencies, and negative-space checks.
+
+Output to: `{out / "creative-hypotheses.md"}` and candidate proposals.
+
+## Adversarial Reviewer
+
+Attack the audit plan itself. Look for skipped files, prematurely dismissed
+scanner hits, weak false-positive assumptions, untested config extremes,
+unmodeled dependencies, and missing invariants.
+
+Output to: `{out / "attack-lines.md"}` and `{out / "skill-evolution.md"}`
 """
 
 
@@ -1569,6 +1587,7 @@ def next_action(args: argparse.Namespace) -> int:
         ("scope.md", "fill authorization, repo, commit, in-scope and out-of-scope rules"),
         ("notes/commands.md", "record and run the smallest reliable baseline build/test command"),
         ("protocol-map.md", "map assets, roles, value flows, accounting units, oracles, and trust boundaries"),
+        ("creative-hypotheses.md", "generate creative discovery hypotheses before over-focusing on generic scanner hits"),
         ("attack-lines.md", "rank the top 3 attack lines from value flow and scanner hits"),
     ]
     for rel, action in checks:
@@ -1609,6 +1628,106 @@ def agents(args: argparse.Namespace) -> int:
     out.write_text(text, encoding="utf-8")
     print(text)
     print(f"\nWrote: {out}")
+    return 0
+
+
+def creative_plan(args: argparse.Namespace) -> int:
+    name = slugify(args.name)
+    out = target_dir(name)
+    if not out.exists():
+        print(f"Initialize target first: {name}", file=sys.stderr)
+        return 1
+    repo = repo_for_target(name) or "TBD"
+    family = family_for_target(name)
+    path = out / "creative-hypotheses.md"
+    if path.exists() and not args.force:
+        print(f"exists: {path}")
+        print("Use --force to rewrite, or edit the existing file.")
+        return 0
+    lanes = [
+        (
+            "Protocol-specific promise breaking",
+            "Write one unique promise this protocol makes, then design a local invariant that breaks if the promise is false.",
+        ),
+        (
+            "Counterfactual state machine",
+            "Construct a weird but legal state: partial init, stale nonzero oracle, dust position, paused/unqueued mix, cancelled residue, or expired maturity with pending value.",
+        ),
+        (
+            "Order perturbation",
+            "Take two or three safe operations and reorder them; compare final accounting state.",
+        ),
+        (
+            "Unit-boundary mismatch",
+            "Trace token decimals, share/assets, debt/interest, quote/base, signed/unsigned, raw/scaled, tick/liquidity, or epoch/maturity boundaries.",
+        ),
+        (
+            "Honest-but-surprising dependency",
+            "Use legal edge behavior from ERC20, ERC4626, oracle, router, callback, Solana account extension, or admin config extremes.",
+        ),
+        (
+            "Negative-space audit",
+            "Search for missing bounds, freshness, receiver binding, market binding, callback post-condition, conservation assertion, queue cleanup, or decimal normalization.",
+        ),
+        (
+            "Scanner inversion",
+            "Pick a boring scanner hit and inspect nearby cross-contract state, ordering, callback, rounding, queue, maturity, or deployment reachability that the scanner cannot model.",
+        ),
+    ]
+    lines = [
+        f"# Creative Hypotheses - {name}",
+        "",
+        f"- Target: {name}",
+        f"- Family: {family}",
+        f"- Repo: {repo}",
+        f"- Generated: {now()}",
+        "",
+        "Use this file after baseline mapping. Do not promote any hypothesis to a finding without local evidence.",
+        "",
+        "## Working Rule",
+        "",
+        "Most obvious bugs have probably been scanned. Prefer protocol-specific, state-machine, ordering, unit-boundary, dependency, and negative-space hypotheses over generic checklist hits.",
+        "",
+        "## Hypothesis Table",
+        "",
+        "| ID | Lane | Hypothesis | Protocol promise challenged | Code path | Weird state or sequence | Why common scanners may miss it | Local test idea | Fastest disproof | Candidate state |",
+        "|---|---|---|---|---|---|---|---|---|---|",
+    ]
+    for index, (lane, prompt) in enumerate(lanes, start=1):
+        lines.append(
+            f"| CREATIVE-{index:03d} | {lane} | {prompt} | TBD | TBD | TBD | TBD | TBD | TBD | suspected |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Next Commands",
+            "",
+            "```bash",
+            f"python3 scripts/auditctl.py agents {name}",
+            f"python3 scripts/auditctl.py ensure-candidate {name} CREATIVE-001 --state suspected --title \"<hypothesis title>\" --validation-plan \"<local test idea>\"",
+            f"python3 scripts/auditctl.py evolve {name} --lesson \"Creative discovery found a protocol-specific missing invariant\" --proposed-change \"Add a reusable invariant or scanner rule after validation\"",
+            "```",
+            "",
+            "## Notes",
+            "",
+            "- Keep creative hypotheses private and local.",
+            "- Record false positives with the disproof path.",
+            "- Convert the best hypothesis into a minimal local PoC or invariant.",
+        ]
+    )
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    append_jsonl(
+        out / "evidence-index.jsonl",
+        {
+            "time": now(),
+            "type": "creative_plan_generated",
+            "target": name,
+            "family": family,
+            "path": str(path),
+            "conclusion": "creative discovery worksheet generated; not vulnerability evidence",
+        },
+    )
+    print(f"creative plan: {path}")
     return 0
 
 
@@ -1947,6 +2066,8 @@ def autopilot_plan(args: argparse.Namespace) -> int:
             gaps.append("baseline command record is still template-like")
         if sparse(out / "protocol-map.md"):
             gaps.append("protocol map is still template-like")
+        if sparse(out / "creative-hypotheses.md"):
+            gaps.append("creative discovery hypotheses are missing or template-like")
         if top:
             next_step = {
                 "kind": "validate_candidate",
@@ -1963,6 +2084,12 @@ def autopilot_plan(args: argparse.Namespace) -> int:
             next_step = {"kind": "baseline", "next_action": "run and record the smallest reliable baseline command"}
         elif sparse(out / "protocol-map.md"):
             next_step = {"kind": "map_protocol", "next_action": "map value flow, assets, roles, oracle, accounting, and trust boundaries"}
+        elif sparse(out / "creative-hypotheses.md"):
+            next_step = {
+                "kind": "creative_discovery",
+                "next_action": f"python3 {ROOT / 'scripts/auditctl.py'} creative-plan {name}",
+                "acceptance_gate": "at least three protocol-specific hypotheses with local validation or disproof paths",
+            }
         elif repo:
             next_step = {"kind": "scan", "next_action": f"python3 {ROOT / 'scripts/auditctl.py'} scan {name}"}
         else:
@@ -2035,6 +2162,7 @@ def merge_agent(args: argparse.Namespace) -> int:
         "false_positive_filters",
         "changed_files",
         "framework_or_skill_evolution_needed",
+        "creative_hypotheses",
     ]
     missing = [key for key in required if key not in payload]
     if missing:
@@ -2670,6 +2798,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_agents = sub.add_parser("agents", help="generate subagent prompts")
     p_agents.add_argument("name")
     p_agents.set_defaults(func=agents)
+
+    p_creative = sub.add_parser("creative-plan", help="generate a creative discovery hypothesis worksheet")
+    p_creative.add_argument("name")
+    p_creative.add_argument("--force", action="store_true")
+    p_creative.set_defaults(func=creative_plan)
 
     p_scan = sub.add_parser("scan", help="run high-signal scanner and promote suspected candidates")
     p_scan.add_argument("name")

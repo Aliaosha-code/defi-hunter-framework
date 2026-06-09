@@ -3,8 +3,9 @@
 Use this prompt to start Codex on a DeFi / on-chain pool project that you own,
 maintain, develop, or are explicitly authorized to audit.
 
-If this repository is available locally, read `AUTHORIZATION.md` before running
-project-specific commands.
+If this repository is available locally, read `AUTHORIZATION.md`,
+`FRAMEWORK.md`, and `CREATIVE_DISCOVERY.md` before running project-specific
+commands.
 
 Replace the placeholders before running:
 
@@ -42,6 +43,8 @@ Replace the placeholders before running:
 不要只分析，要实际推进审计工作。
 不要因为“暂未发现漏洞”而停止。
 在没有 confirmed finding 之前，持续扩展审计路径、测试假设、编写 PoC、运行 fuzz/invariant、复查资金流和边界条件。
+常见漏洞和 scanner hits 只作为热身；大部分明显漏洞别人已经扫过，必须额外做协议特有、反事实、组合路径、顺序扰动和负空间发现。
+每轮至少提出 3 个非模板化 creative hypotheses，并给出最快本地验证或证伪方式。
 
 只有满足以下任一条件才允许停止：
 1. 已发现 confirmed finding，并完成完整汇报；
@@ -84,8 +87,20 @@ Replace the placeholders before running:
    - 子代理 E：invariant designer，负责 fuzz/invariant 测试计划
    - 子代理 F：validator，负责把候选漏洞缩成最小本地 PoC
    - 子代理 G：skill evolution reviewer，负责提出框架或 skill 升级建议
+   - 子代理 H：novelty hunter，负责基于 CREATIVE_DISCOVERY.md 生成协议特有、非模板化漏洞假设
+   - 子代理 I：adversarial reviewer，负责攻击当前审计计划，找出过早降权、误判 false positive、未读文件和缺失测试
 
-4. 优先寻找：
+4. 创造性发现 pass：
+   - 写出协议自己的独特承诺，不要只套通用 checklist
+   - 构造协议以为“不可能”的 weird state
+   - 重排正常用户操作顺序并比较最终状态
+   - 跟踪单位、精度、rounding、share、debt、oracle quote 边界
+   - 使用 honest-but-surprising dependency 行为，而不是只假设恶意依赖
+   - 找 missing checks、missing postconditions、missing binding
+   - 为每个假设写出最快本地证伪路径
+   - 运行：python3 scripts/auditctl.py creative-plan <project name>
+
+5. 优先寻找：
    - solvency 破坏
    - ERC4626 / LP share accounting 错误
    - first deposit / donation / dust 攻击
@@ -97,13 +112,13 @@ Replace the placeholders before running:
    - pause / emergency / withdrawal queue 导致资金冻结
    - 协议特有机制带来的新攻击面
 
-5. 候选漏洞状态分类：
+6. 候选漏洞状态分类：
    - confirmed with PoC
    - plausible but unproven
    - false positive
    - informational
 
-6. 汇报规则：
+7. 汇报规则：
    一旦发现 suspected vulnerability，立即报告：
    - 代码路径
    - 初步影响
@@ -124,7 +139,7 @@ Replace the placeholders before running:
    - 回归测试建议
    - 报告草稿
 
-7. 持续审计循环：
+8. 持续审计循环：
    如果当前假设被证伪：
    - 标记为 false positive
    - 记录原因
@@ -143,7 +158,7 @@ Replace the placeholders before running:
    - 补全资金流、权限、oracle、费用、清算或奖励逻辑
    - 继续运行
 
-8. 自进化要求：
+9. 自进化要求：
    - 记录本轮新增攻击面
    - 记录无效 checklist
    - 记录需要新增的 invariant 模板
