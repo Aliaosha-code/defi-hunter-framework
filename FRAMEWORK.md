@@ -62,9 +62,16 @@ targets/<target>/
 
 ## Basic Commands
 
-For a new authorized project, start Codex with the prompt template in
+For a new authorized project, start Codex by reading
+`AUTHORIZATION.md`, then use the prompt template in
 `prompts/authorized-defi-audit.md`, then initialize or attach the target with
 the commands below.
+
+Put the authorization statement at the top of the session before running any
+project-specific commands. The framework is intended for whitehat audit and
+bug-bounty work where the user owns, maintains, develops, or has explicit
+authorization to review the target. When scope is unclear, stop at local
+defensive review and ask for confirmation.
 
 Discover and rank local DeFi repositories:
 

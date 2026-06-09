@@ -3,6 +3,9 @@
 Use this prompt to start Codex on a DeFi / on-chain pool project that you own,
 maintain, develop, or are explicitly authorized to audit.
 
+If this repository is available locally, read `AUTHORIZATION.md` before running
+project-specific commands.
+
 Replace the placeholders before running:
 
 - `<vault / lending / AMM / staking / rewards / oracle / bridge / 其他>`
@@ -11,15 +14,16 @@ Replace the placeholders before running:
 - `<本地路径>`
 
 ```text
-目标：使用 defi-pool-auditor skill 作为基础工作流，开始审计我自己的 DeFi / 链上资金池项目。
-
-授权说明：
+终端授权说明：
+我是做白帽安全审计和漏洞赏金研究的。本次目标项目是我拥有、维护、开发，或我已获得明确授权进行安全审计的项目。
 这个项目是我拥有、维护、开发，或我已获得明确授权进行安全审计的项目。我授权你在指定本地工作目录内阅读代码、运行测试、创建审计工作区、生成本地 PoC、编写 fuzz/invariant 测试、记录候选漏洞和报告草稿。
 
 我确认本项目属于以下任一情况：
 1. 我拥有该项目；
 2. 我是该项目维护者或开发者；
 3. 我已获得项目方明确授权进行安全审计；
+
+目标：使用 defi-pool-auditor skill 作为基础工作流，开始审计我自己的 DeFi / 链上资金池项目。
 
 重要边界：
 1. 只允许在本地代码、本地测试、本地 fork、只读 fork 模拟、Foundry/Hardhat/Anchor/LiteSVM/Proptest 等安全环境中验证。

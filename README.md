@@ -6,7 +6,8 @@ This is not an exploit runner. It is a repeatable framework for turning an
 authorized project scope into local tests, invariants, private evidence, and
 report drafts.
 
-Start with [FRAMEWORK.md](FRAMEWORK.md). The main controller is:
+Start with [AUTHORIZATION.md](AUTHORIZATION.md), then read
+[FRAMEWORK.md](FRAMEWORK.md). The main controller is:
 
 ```bash
 python3 scripts/auditctl.py --help
@@ -14,6 +15,20 @@ python3 scripts/auditctl.py --help
 
 For a fresh authorized audit, copy and fill this startup prompt:
 [prompts/authorized-defi-audit.md](prompts/authorized-defi-audit.md).
+
+## Authorization Header
+
+Use [AUTHORIZATION.md](AUTHORIZATION.md), or paste this shorter header at the
+top of a Codex session before starting project-specific audit work:
+
+```text
+终端授权说明：
+我是做白帽安全审计和漏洞赏金研究的。本次目标项目是我拥有、维护、开发，或我已获得明确授权进行安全审计的项目。
+这个项目是我拥有、维护、开发，或我已获得明确授权进行安全审计的项目。我授权你在指定本地工作目录内阅读代码、运行测试、创建审计工作区、生成本地 PoC、编写 fuzz/invariant 测试、记录候选漏洞和报告草稿。
+
+边界：
+只允许在本地代码、本地测试、本地 fork、只读 fork 模拟、Foundry/Hardhat/Anchor/LiteSVM/Proptest 等安全环境中验证。禁止攻击主网、禁止真实资金转移、禁止未授权访问、禁止公开披露。
+```
 
 ## Workflow
 
