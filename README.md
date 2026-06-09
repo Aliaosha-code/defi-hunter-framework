@@ -16,6 +16,9 @@ python3 scripts/auditctl.py --help
 For a fresh authorized audit, copy and fill this startup prompt:
 [prompts/authorized-defi-audit.md](prompts/authorized-defi-audit.md).
 
+For a more autonomous run with subagents and framework/skill evolution, use:
+[prompts/autonomous-self-evolving-defi-audit.md](prompts/autonomous-self-evolving-defi-audit.md).
+
 ## Authorization Header
 
 Use [AUTHORIZATION.md](AUTHORIZATION.md), or paste this shorter header at the
@@ -92,6 +95,21 @@ Update state after validation:
 python3 scripts/auditctl.py update-candidate my-target MY-CANDIDATE-001 --state "plausible but unproven"
 python3 scripts/auditctl.py log-evidence my-target --type poc_test --candidate-id MY-CANDIDATE-001
 python3 scripts/auditctl.py merge-agent my-target --file agent-output.json
+```
+
+Generate and merge subagent work:
+
+```bash
+python3 scripts/auditctl.py agents my-target
+python3 scripts/auditctl.py merge-agent my-target --file agent-output.json
+```
+
+Record framework or skill evolution lessons:
+
+```bash
+python3 scripts/auditctl.py evolve my-target \
+  --lesson "The current checklist missed a protocol-specific invariant." \
+  --proposed-change "Add a reusable invariant template and rerun validation."
 ```
 
 ## Safety Rules

@@ -566,6 +566,10 @@ Use only authorized/local defensive review. Keep PoCs local: unit tests,
 invariants, fuzz harnesses, or read-only fork simulations. Do not provide live
 fund movement or third-party exploitation instructions.
 
+The framework and existing prompts are starting points, not limits. If the
+current workflow misses a protocol-specific risk, propose or create local
+framework, script, template, harness, scanner, or skill-evolution updates.
+
 Repo/path: {repo_path or "TBD"}
 Target workspace: {out}
 
@@ -579,6 +583,7 @@ Every final subagent output must include:
 - next_validation
 - false_positive_filters
 - changed_files
+- framework_or_skill_evolution_needed
 
 ## Scope Mapper
 
@@ -624,7 +629,9 @@ Output to: `{out / "findings.tsv"}`, `{out / "findings"}`, and `{out / "logs"}`
 
 ## Skill Evolution Reviewer
 
-Record which workflow elements helped, failed, or should become reusable.
+Record which workflow elements helped, failed, or should become reusable. If a
+new script, prompt, harness, invariant template, scanner rule, or skill update
+is useful, describe the exact change and how it should be validated.
 
 Output to: `{out / "skill-evolution.md"}`
 """
@@ -2018,7 +2025,17 @@ def merge_agent(args: argparse.Namespace) -> int:
         print(f"agent output must be JSON: {exc}", file=sys.stderr)
         return 1
 
-    required = ["role", "files_reviewed", "candidate_ids", "evidence_refs", "confidence", "next_validation", "false_positive_filters", "changed_files"]
+    required = [
+        "role",
+        "files_reviewed",
+        "candidate_ids",
+        "evidence_refs",
+        "confidence",
+        "next_validation",
+        "false_positive_filters",
+        "changed_files",
+        "framework_or_skill_evolution_needed",
+    ]
     missing = [key for key in required if key not in payload]
     if missing:
         print("agent output missing fields: " + ", ".join(missing), file=sys.stderr)

@@ -63,9 +63,14 @@ targets/<target>/
 ## Basic Commands
 
 For a new authorized project, start Codex by reading
-`AUTHORIZATION.md`, then use the prompt template in
-`prompts/authorized-defi-audit.md`, then initialize or attach the target with
-the commands below.
+`AUTHORIZATION.md`, then choose a prompt:
+
+- `prompts/authorized-defi-audit.md`: standard authorized audit run.
+- `prompts/autonomous-self-evolving-defi-audit.md`: autonomous run with
+  subagents, framework evolution, script/template updates, and skill evolution
+  proposals when the current workflow is insufficient.
+
+Then initialize or attach the target with the commands below.
 
 Put the authorization statement at the top of the session before running any
 project-specific commands. The framework is intended for whitehat audit and
@@ -115,6 +120,11 @@ Generate subagent prompts:
 ```bash
 python3 scripts/auditctl.py agents my-target
 ```
+
+The generated subagent roles cover scope mapping, value flow, accounting,
+oracle/economic analysis, invariant design, validation, and framework
+evolution. Subagent results should be merged through `merge-agent`, not written
+directly into candidate/finding tables.
 
 Run the high-signal scanner and promote hits into `candidates.tsv` as
 `suspected`:
@@ -301,9 +311,14 @@ guesswork:
 - `next_validation`
 - `false_positive_filters`
 - `changed_files`
+- `framework_or_skill_evolution_needed`
 
 The main Codex should merge only evidence-backed candidate changes into
 `candidates.tsv` or `findings.tsv`.
+
+If `framework_or_skill_evolution_needed` is not empty, the main Codex should
+record it with `evolve` or create a local prompt, script, harness, scanner,
+template, or skill-evolution proposal before continuing the next audit round.
 
 State table writes are serialized by the framework. Subagents should not edit
 `candidates.tsv` directly; they should return structured output or ask the main
