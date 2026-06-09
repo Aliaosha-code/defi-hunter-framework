@@ -1,0 +1,48 @@
+# Local audit workspaces and evidence
+targets/
+scans/
+logs/
+reports/
+findings/
+poc/
+.codex-audit/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Command output and generated data
+*.log
+*.trace
+*.tmp
+*.jsonl
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Node and Solidity build output
+node_modules/
+coverage/
+dist/
+build/
+out/
+cache/
+artifacts/
+broadcast/
+typechain-types/
+
+# Rust and Solana build output
+target/
+.anchor/
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
